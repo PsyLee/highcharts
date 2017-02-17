@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Chart
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="https://code.jquery.com/jquery-1.9.1.js" type="text/javascript"></script>
+
+	<script src="https://code.highcharts.com/stock/highstock.js" type="text/javascript"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js" type="text/javascript"></script>
+    
+   	<script src="http://code.highcharts.com/modules/data.js" type="text/javascript"></script>
+
+	<script type="text/javascript" src="http://www.highcharts.com/highslide/highslide-full.min.js"></script>
+	<script type="text/javascript" src="http://www.highcharts.com/highslide/highslide.config.js" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="http://www.highcharts.com/highslide/highslide.css" />
+    
+    <script type="text/javascript">
+    $(function () {
+
+        Highcharts.setOptions({
+            global : {
+                useUTC : false
+            }
+        });
+
+        // Create the chart
+        $('#container').highcharts('StockChart', {
+            chart : {
+            	type: 'area',
+                events : {
+                    load : function () {
+
+                        // set up the updating of the chart each second
+                        var series = this.series[0];
+                        setInterval(function () {
+                            var x = (new Date()).getTime(), // current time
+                                y = Math.round(Math.random() * 100);
+                            series.addPoint([x, y], true, true);
+                        }, 1000);
+                    }
+                }
+            },
+            
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                            	//geting the value from the chart
+                            	app.print(JSON.stringify(this.y));
+                            }
+                        }
+                    }
+                }
+            },
+
+            rangeSelector: {
+                buttons: [{
+                    count: 1,
+                    type: 'minute',
+                    text: '1M'
+                }, {
+                    count: 5,
+                    type: 'minute',
+                    text: '5M'
+                }, {
+                    type: 'all',
+                    text: 'All'
+                }],
+                inputEnabled: true,
+                selected: 1
+            },
+
+            title : {
+                text : 'Live random data'
+            },
+            
+            yAxis: {
+                reversed: true,
+                showFirstLabel: false,
+                showLastLabel: true
+            },
+
+            exporting: {
+                enabled: false
+            },
+
+            series : [{
+                name : 'Random data',
+                fillColor : {
+                    linearGradient : {
+                        x1: 0,
+                        y1: 1,
+                        x2: 0,
+                        y2: 0
+                    },
+                    stops : [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                },
+                data : (function () {
+                    // generate an array of random data
+                    var data = [], time = (new Date()).getTime(), i;
+
+                    for (i = -999; i <= 0; i += 1) {
+                        data.push([
+                            time + i * 1000,
+                            Math.round(Math.random() * 100)
+                        ]);
+                    }
+                    return data;
+                }())
+            }]
+        });
+        
+//         $('#button').click(function () {
+//             var chart = $('#container').highcharts();
+//         	var json = JSON.parse(app.send());
+//             var series = chart.series[0];   
+//             var x = (new Date()).getTime(), // current time
+//                 y = json;
+//             series.addPoint([x, y], true, true);
+//         });
+
+    });
+
+    </script>
+  </head>
+  <body>
+    <div id="container" style="width: 100%; height: 100%; margin: 0 auto"></div>
+<!--     <button id="button">Set 150</button> -->
+  </body>
+</html>
